@@ -1,6 +1,7 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase.ts";
+import { AddProductForm } from "./AddProductForm.tsx";
 
 type Product = {
   id: number;
@@ -10,16 +11,15 @@ type Product = {
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
+  const fetchProducts = async () => {
+    const { data } = await supabase.from("products").select("*");
+    if (data) {
+      setProducts(data);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const { data } = await supabase.from("products").select("*");
-      if (data) {
-        setProducts(data);
-      }
-      console.log(data);
-    };
-
+    // eslint-disable-next-line
     fetchProducts();
   }, []);
 
@@ -32,9 +32,11 @@ function App() {
 
   return (
     <>
+      <AddProductForm onInsert={fetchProducts} />
       {products.map((el) => {
         return (
           <div
+            key={el.id}
             style={{
               display: "flex",
               gap: "5px",
