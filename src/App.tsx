@@ -23,12 +23,32 @@ function App() {
     fetchProducts();
   }, []);
 
+  const handleDeleteProduct = async (id: number) => {
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (!error) {
+      setProducts(products.filter((el) => el.id !== id));
+    }
+  };
+
   return (
     <>
       {products.map((el) => {
         return (
-          <div>
-            <h1>{el.name}</h1>;<p>{el.price}</p>;
+          <div
+            style={{
+              display: "flex",
+              gap: "5px",
+              marginTop: "15px",
+            }}
+          >
+            <p>{el.name}</p>
+            <button
+              onClick={() => {
+                handleDeleteProduct(el.id);
+              }}
+            >
+              Delete
+            </button>
           </div>
         );
       })}
