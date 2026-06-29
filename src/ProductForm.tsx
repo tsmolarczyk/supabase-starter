@@ -1,14 +1,14 @@
 import { type FormEvent, useEffect, useState } from "react";
-import styles from "./AddProductForm.module.css";
+import styles from "./ProductForm.module.css";
 import { supabase } from "./lib/supabase.ts";
 import type { Product } from "./App.tsx";
 
-type AddProductFormProps = {
-  onInsert: () => void;
+type ProductFormProps = {
+  onSuccess: () => void;
   product?: Product | null;
 };
 
-export function AddProductForm({ onInsert, product }: AddProductFormProps) {
+export function ProductForm({ onSuccess, product }: ProductFormProps) {
   const [form, setForm] = useState({ name: "", price: 0 });
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export function AddProductForm({ onInsert, product }: AddProductFormProps) {
         .update({ ...form })
         .eq("id", product.id);
       if (!error) {
-        onInsert();
+        onSuccess();
       }
       return;
     }
@@ -36,14 +36,14 @@ export function AddProductForm({ onInsert, product }: AddProductFormProps) {
     const { error } = await supabase.from("products").insert({ ...form });
 
     if (!error) {
-      onInsert();
+      onSuccess();
     }
     setForm({ name: "", price: 0 });
   };
 
   return (
     <div>
-      <h1>Add new product</h1>
+      <h1>Add or update the product</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="name">Name:</label>
         <input
@@ -60,7 +60,7 @@ export function AddProductForm({ onInsert, product }: AddProductFormProps) {
           value={form.price}
           onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
         />
-        <button type="submit">Add new product</button>
+        <button type="submit">{product ? "Update" : "Add"}</button>
       </form>
     </div>
   );

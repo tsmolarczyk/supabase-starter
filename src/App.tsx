@@ -1,7 +1,7 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase.ts";
-import { AddProductForm } from "./AddProductForm.tsx";
+import { ProductForm } from "./ProductForm.tsx";
 
 export type Product = {
   id: number;
@@ -11,7 +11,7 @@ export type Product = {
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const fetchProducts = async () => {
     const { data } = await supabase.from("products").select("*").order("id");
     if (data) {
@@ -33,7 +33,7 @@ function App() {
 
   return (
     <>
-      <AddProductForm onInsert={fetchProducts} product={editProduct} />
+      <ProductForm onSuccess={fetchProducts} product={selectedProduct} />
       {products.map((el) => {
         return (
           <div
@@ -48,7 +48,7 @@ function App() {
             <p>{el.price}</p>
             <button
               onClick={() => {
-                setEditProduct(el);
+                setSelectedProduct(el);
                 console.log(el);
               }}
             >
