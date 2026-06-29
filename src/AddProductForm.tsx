@@ -1,16 +1,37 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import styles from "./AddProductForm.module.css";
 import { supabase } from "./lib/supabase.ts";
+import type { Product } from "./App.tsx";
 
 type AddProductFormProps = {
   onInsert: () => void;
+  product?: Product | null;
 };
 
-export function AddProductForm({ onInsert }: AddProductFormProps) {
+export function AddProductForm({ onInsert, product }: AddProductFormProps) {
   const [form, setForm] = useState({ name: "", price: 0 });
+
+  useEffect(() => {
+    if (product) {
+      // TODO:
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm({ name: product.name, price: product.price });
+    }
+  }, [product]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (product) {
+      const { error } = await supabase
+        .from("products")
+        .update({ ...form })
+        .eq("id", product.id);
+      if (!error) {
+        onInsert();
+      }
+      return;
+    }
 
     const { error } = await supabase.from("products").insert({ ...form });
 

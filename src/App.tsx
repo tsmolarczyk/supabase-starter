@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase.ts";
 import { AddProductForm } from "./AddProductForm.tsx";
 
-type Product = {
+export type Product = {
   id: number;
   name: string;
   price: number;
@@ -11,8 +11,9 @@ type Product = {
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
   const fetchProducts = async () => {
-    const { data } = await supabase.from("products").select("*");
+    const { data } = await supabase.from("products").select("*").order("id");
     if (data) {
       setProducts(data);
     }
@@ -32,7 +33,7 @@ function App() {
 
   return (
     <>
-      <AddProductForm onInsert={fetchProducts} />
+      <AddProductForm onInsert={fetchProducts} product={editProduct} />
       {products.map((el) => {
         return (
           <div
@@ -44,6 +45,15 @@ function App() {
             }}
           >
             <p>{el.name}</p>
+            <p>{el.price}</p>
+            <button
+              onClick={() => {
+                setEditProduct(el);
+                console.log(el);
+              }}
+            >
+              Edit
+            </button>
             <button
               onClick={() => {
                 handleDeleteProduct(el.id);
